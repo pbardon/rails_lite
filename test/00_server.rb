@@ -11,7 +11,7 @@ trap('INT') { server.shutdown }
 
 class MyController < ControllerBase
   def go
-    render_content("hello world!", "text/html")
+  #  render_content("hello world!", "text/html")
 
     # after you have template rendering, uncomment:
    render :show

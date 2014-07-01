@@ -18,9 +18,9 @@ class ControllerBase
   # set the responses content type to the given type
   # later raise an error if the developer tries to double render
   def render_content(content, type)
-    raise "Can't Render Twice" if already_built_response?
     @res["Content-Type"] = type
     @res.body = content
+    raise "Can't Render Twice" if already_built_response?
     @already_built_response = true
   end
 
@@ -31,10 +31,10 @@ class ControllerBase
 
   # set the response status code and header
   def redirect_to(url)
-    raise "Can't Render Twice" if already_built_response?
     @res.status = 302
     @res.body = "<HTML><A HREF=\"#{url.to_s}\">#{url.to_s}</A>.</HTML>\n"
     @res.header['location'] = url.to_s
+    raise "Can't Render Twice" if already_built_response?
     @already_built_response = true
   end
 
