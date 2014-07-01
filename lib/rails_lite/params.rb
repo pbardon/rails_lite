@@ -7,8 +7,14 @@ class Params
   # 3. route params
   def initialize(req, route_params = {})
     @params = {}
-    parse_www_encoded_form(req.query_string) if req.query_string
+    @params.merge!(route_params)
+    @params.merge!(parse_www_encoded_form(req.query_string)) if req.query_string
+
+    print req.body
+    @params.merge!(parse_www_encoded_form(req.body)) if req.body
+
     @params
+
   end
 
   def [](key)
@@ -37,13 +43,33 @@ class Params
   # { "user" => { "address" => { "street" => "main", "zip" => "89436" } } }
   def parse_www_encoded_form(www_encoded_form)
     decoded = URI.decode_www_form(www_encoded_form)
+    output_hash = {}
     decoded.each do |param|
-      @params[param.first] = param.last
+      keys = parse_key(param.first)
+      current_hash = output_hash
+
+      keys[0...-1].each do |key|
+        if !current_hash.has_key?(key)
+          current_hash[key] = {}
+          current_hash = current_hash[key]
+        else
+          current_hash = current_hash[key]
+        end
+
+      end
+
+      current_hash[keys[-1]] = param.last
     end
+
+    output_hash
+
   end
+
+
 
   # this should return an array
   # user[address][street] should return ['user', 'address', 'street']
   def parse_key(key)
+    key.split(/\]\[|\[|\]/)
   end
 end
