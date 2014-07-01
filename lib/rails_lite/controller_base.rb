@@ -20,6 +20,7 @@ class ControllerBase
   def render_content(content, type)
     @res["Content-Type"] = type
     @res.body = content
+    session.store_session(@res)
     raise "Can't Render Twice" if already_built_response?
     @already_built_response = true
   end
@@ -34,6 +35,7 @@ class ControllerBase
     @res.status = 302
     @res.body = "<HTML><A HREF=\"#{url.to_s}\">#{url.to_s}</A>.</HTML>\n"
     @res.header['location'] = url.to_s
+    session.store_session(@res)
     raise "Can't Render Twice" if already_built_response?
     @already_built_response = true
   end
@@ -51,6 +53,7 @@ class ControllerBase
 
   # method exposing a `Session` object
   def session
+    @session ||= Session.new(@req)
   end
 
   # use this with the router to call action_name (:index, :show, :create...)
