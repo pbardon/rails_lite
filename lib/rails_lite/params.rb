@@ -9,7 +9,7 @@ class Params
     @params = {}
     @params.merge!(route_params)
     @params.merge!(parse_www_encoded_form(req.query_string)) if req.query_string
-
+    @permitted_keys = []
     print req.body
     @params.merge!(parse_www_encoded_form(req.body)) if req.body
 
@@ -22,12 +22,19 @@ class Params
   end
 
   def permit(*keys)
+    keys.each do |key|
+      @permitted_keys << key
+    end
   end
 
   def require(key)
+    if !@params.include?(key)
+      raise AttributeNotFoundError
+    end
   end
 
   def permitted?(key)
+    @permitted_keys.include?(key)
   end
 
   def to_s
